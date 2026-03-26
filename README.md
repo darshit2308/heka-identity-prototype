@@ -4,7 +4,7 @@
 
 ### Decentralized Contributor Identity Verification for Open Source
 
-*A working prototype built for the [LF Decentralized Trust Mentorship Program — Issue #87](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87)*
+_A working prototype built for the [LF Decentralized Trust Mentorship Program — Issue #87](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87)_
 
 ---
 
@@ -30,10 +30,10 @@
 
 Open source contribution platforms like GitHub rely on email addresses and usernames for contributor attribution. This trust model has three fundamental weaknesses:
 
-| Weakness | Reality |
-|---|---|
-| **Identity Spoofing** | Anyone can set `git config user.email linus@kernel.org` and commit as Linus Torvalds |
-| **Fragmented Identity** | A contributor's reputation is siloed per-platform with no portable proof |
+| Weakness                | Reality                                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------------------- |
+| **Identity Spoofing**   | Anyone can set `git config user.email linus@kernel.org` and commit as Linus Torvalds              |
+| **Fragmented Identity** | A contributor's reputation is siloed per-platform with no portable proof                          |
 | **Agentic AI Flooding** | AI agents can now impersonate developers and flood repositories with low-quality or malicious PRs |
 
 These risks are not hypothetical. As open source becomes critical infrastructure, the integrity of who contributes what becomes a security concern — not just a social one.
@@ -48,7 +48,7 @@ These risks are not hypothetical. As open source becomes critical infrastructure
 - **W3C Verifiable Credentials (VCs)** — a tamper-proof, digitally signed certificate issued by a trusted authority (the Heka Issuer)
 - **GitHub Checks API** — native PR-level enforcement that blocks unverified contributors automatically
 
-When a contributor opens a Pull Request, the system doesn't ask *"who does GitHub think you are?"* — it asks *"can you prove it cryptographically?"*
+When a contributor opens a Pull Request, the system doesn't ask _"who does GitHub think you are?"_ — it asks _"can you prove it cryptographically?"_
 
 ---
 
@@ -56,8 +56,8 @@ When a contributor opens a Pull Request, the system doesn't ask *"who does GitHu
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                      HEKA IDENTITY SYSTEM                            │
-│                                                                      │
+│                      HEKA IDENTITY SYSTEM                           │
+│                                                                     │
 │   ┌──────────────┐    POST /onboard     ┌────────────────────────┐  │
 │   │              │ ──────────────────── │                        │  │
 │   │  Contributor │                      │  mock-heka-credo       │  │
@@ -72,17 +72,17 @@ When a contributor opens a Pull Request, the system doesn't ask *"who does GitHu
 │   │    GitHub    │                      └───────────┬────────────┘  │
 │   │  Repository  │                                  │               │
 │   │              │ ◀────────────────────────────────┘               │
-│   └──────────────┘   ✅ Check: Verified / ❌ Check: Unverified      │
-│          ▲                                                           │
-│          │           POST /verify                                    │
+│   └──────────────┘   ✅ Check: Verified / ❌ Check: Unverified       │
+│          ▲                                                          │
+│          │           POST /verify                                   │
 │   ┌──────┴───────┐ ──────────────────── ┌────────────────────────┐  │
 │   │              │                      │                        │  │
 │   │ mock-heka-   │ ◀──────────────────  │  mock-heka-credo       │  │
 │   │    bot       │  { isValid, did }    │  (same service)        │  │
 │   │ (Probot App) │                      │                        │  │
 │   │              │                      └────────────────────────┘  │
-│   └──────────────┘                                                   │
-│                                                                      │
+│   └──────────────┘                                                  │
+│                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 
                     CRYPTOGRAPHIC TRUST FLOW
@@ -96,14 +96,14 @@ When a contributor opens a Pull Request, the system doesn't ask *"who does GitHu
 
 ### Component Breakdown
 
-| Component | Technology | Role |
-|---|---|---|
+| Component         | Technology                   | Role                                                            |
+| ----------------- | ---------------------------- | --------------------------------------------------------------- |
 | `mock-heka-credo` | Node.js + Credo-ts + Express | Identity Issuer — creates DIDs, signs VCs, verifies credentials |
-| `mock-heka-bot` | Probot + TypeScript | GitHub App — listens for PR events, enforces identity checks |
-| Askar Wallet | `@hyperledger/aries-askar` | Secure key management and cryptographic operations |
-| DID Method | `did:key` (Ed25519) | Portable, self-sovereign decentralized identifier |
-| Credential Format | W3C VC / JWT (`jwt_vc`) | Tamper-proof signed identity certificate |
-| Webhook Tunnel | Smee.io | Routes GitHub webhook events to local development server |
+| `mock-heka-bot`   | Probot + TypeScript          | GitHub App — listens for PR events, enforces identity checks    |
+| Askar Wallet      | `@hyperledger/aries-askar`   | Secure key management and cryptographic operations              |
+| DID Method        | `did:key` (Ed25519)          | Portable, self-sovereign decentralized identifier               |
+| Credential Format | W3C VC / JWT (`jwt_vc`)      | Tamper-proof signed identity certificate                        |
+| Webhook Tunnel    | Smee.io                      | Routes GitHub webhook events to local development server        |
 
 ---
 
@@ -162,7 +162,6 @@ The following screenshots show the system running end-to-end on a real GitHub re
 
 > After onboarding, the contributor's DID appears in the PR check summary.
 
-
 ![alt text](image-3.png)
 
 ---
@@ -171,12 +170,12 @@ The following screenshots show the system running end-to-end on a real GitHub re
 
 ### Prerequisites
 
-| Requirement | Version |
-|---|---|
-| Node.js | **v20.x LTS only** (v18.x also works — v21+ is NOT supported due to native Askar bindings) |
-| npm | v9+ |
-| GitHub Account | Required to install the GitHub App |
-| Smee.io | Free — no account needed |
+| Requirement    | Version                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------ |
+| Node.js        | **v20.x LTS only** (v18.x also works — v21+ is NOT supported due to native Askar bindings) |
+| npm            | v9+                                                                                        |
+| GitHub Account | Required to install the GitHub App                                                         |
+| Smee.io        | Free — no account needed                                                                   |
 
 ---
 
@@ -198,6 +197,7 @@ cp .env.example .env
 ```
 
 Edit `.env`:
+
 ```env
 PORT=3000
 WALLET_ID=heka-issuer-wallet
@@ -205,11 +205,13 @@ WALLET_KEY=your-strong-wallet-passphrase-here
 ```
 
 Start the service:
+
 ```bash
 npm start
 ```
 
 You should see:
+
 ```
 🚀 Starting Mock Heka Identity Service...
 ✅ Credo agent initialised
@@ -229,6 +231,7 @@ cp .env.example .env
 ```
 
 Create a GitHub App:
+
 1. Go to **GitHub → Settings → Developer Settings → GitHub Apps → New GitHub App**
 2. Set the Webhook URL to your Smee.io channel (get one free at [smee.io](https://smee.io))
 3. Set permissions: **Checks → Read & Write**, **Pull Requests → Read**
@@ -236,6 +239,7 @@ Create a GitHub App:
 5. Download your private key
 
 Edit `.env`:
+
 ```env
 APP_ID=your_github_app_id
 PRIVATE_KEY_PATH=./private-key.pem
@@ -245,6 +249,7 @@ HEKA_SERVICE_URL=http://localhost:3000
 ```
 
 Start the bot:
+
 ```bash
 npm start
 ```
@@ -254,6 +259,7 @@ npm start
 ### Step 4 — Test the Full Flow
 
 **Onboard a contributor:**
+
 ```bash
 curl -X POST http://localhost:3000/onboard \
   -H "Content-Type: application/json" \
@@ -261,6 +267,7 @@ curl -X POST http://localhost:3000/onboard \
 ```
 
 Expected response:
+
 ```json
 {
   "message": "Onboarding successful",
@@ -270,6 +277,7 @@ Expected response:
 ```
 
 **Verify a credential:**
+
 ```bash
 curl -X POST http://localhost:3000/verify \
   -H "Content-Type: application/json" \
@@ -277,6 +285,7 @@ curl -X POST http://localhost:3000/verify \
 ```
 
 Expected response:
+
 ```json
 {
   "status": "verified",
@@ -317,13 +326,14 @@ heka-identity-prototype/
 
 ### Identity Service (`mock-heka-credo`) — Port 3000
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/status` | Health check — returns issuer DID |
-| `POST` | `/onboard` | Issues a Verifiable Credential for a contributor |
-| `POST` | `/verify` | Cryptographically verifies a contributor's credential |
+| Method | Endpoint   | Description                                           |
+| ------ | ---------- | ----------------------------------------------------- |
+| `GET`  | `/status`  | Health check — returns issuer DID                     |
+| `POST` | `/onboard` | Issues a Verifiable Credential for a contributor      |
+| `POST` | `/verify`  | Cryptographically verifies a contributor's credential |
 
 **`POST /onboard`**
+
 ```json
 // Request
 { "github_username": "darshit2308" }
@@ -337,6 +347,7 @@ heka-identity-prototype/
 ```
 
 **`POST /verify`**
+
 ```json
 // Request
 { "github_username": "darshit2308" }
@@ -359,6 +370,7 @@ heka-identity-prototype/
 ### Why `did:key`?
 
 For the MVP, `did:key` was chosen because it is:
+
 - **Self-contained** — no external ledger required to resolve
 - **Immediately verifiable** — the public key is encoded directly in the DID
 - **Production-compatible** — the system is designed to swap in `did:hedera` with minimal changes
@@ -403,15 +415,15 @@ against issuer's public key resolved from DID Document
 
 This prototype deliberately simplifies certain components to focus on proving the hardest architectural pieces. Here is an honest breakdown:
 
-| Feature | MVP (This Prototype) | Production |
-|---|---|---|
-| **DID Method** | `did:key` (local, no ledger) | `did:hedera` anchored on Hedera Testnet/Mainnet |
-| **Identity Storage** | In-memory JavaScript object | Persistent DB (PostgreSQL) or Hedera Smart Contract |
-| **Onboarding Auth** | GitHub username trusted as-is | GPG challenge-response — contributor signs a server nonce with their GPG private key to prove ownership |
-| **VC Format** | W3C JWT VC | SD-JWT (Selective Disclosure JWT) for privacy-preserving presentation |
-| **Wallet** | Askar in-process | Full Heka Identity Platform cloud wallet |
-| **Verification** | Simple VC signature check | Linked VP from contributor DID Document (Option 1 in issue) |
-| **GitHub App** | Checks API only | Full status checks + PR comments + repo-specific configuration |
+| Feature              | MVP (This Prototype)          | Production                                                                                              |
+| -------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **DID Method**       | `did:key` (local, no ledger)  | `did:hedera` anchored on Hedera Testnet/Mainnet                                                         |
+| **Identity Storage** | In-memory JavaScript object   | Persistent DB (PostgreSQL) or Hedera Smart Contract                                                     |
+| **Onboarding Auth**  | GitHub username trusted as-is | GPG challenge-response — contributor signs a server nonce with their GPG private key to prove ownership |
+| **VC Format**        | W3C JWT VC                    | SD-JWT (Selective Disclosure JWT) for privacy-preserving presentation                                   |
+| **Wallet**           | Askar in-process              | Full Heka Identity Platform cloud wallet                                                                |
+| **Verification**     | Simple VC signature check     | Linked VP from contributor DID Document (Option 1 in issue)                                             |
+| **GitHub App**       | Checks API only               | Full status checks + PR comments + repo-specific configuration                                          |
 
 ---
 
@@ -434,6 +446,7 @@ The following items represent the production roadmap discussed in [Issue #87](ht
 This prototype is built as a pre-application MVP for the **LF Decentralized Trust Mentorship Program (LFDT-2026)**, specifically [Issue #87 — Hiero: Contributor Identity Verification Prototype](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87).
 
 The architecture is designed to integrate with:
+
 - **Heka Identity Platform** — the existing Hiero identity ecosystem (Credo-ts is used internally by Heka)
 - **Identity Collaboration Hub** — the prototype can be tested against real Hiero repositories
 - **OpenVTC LFDT Lab** — the decentralized trust graph initiative for Linux Kernel contribution flow
@@ -445,6 +458,7 @@ This project serves as a reference implementation demonstrating that decentraliz
 ## 👨‍💻 Author
 
 **Darshit Khandelwal**
+
 - GitHub: [@darshit2308](https://github.com/darshit2308)
 - LinkedIn: [darshit-khandelwal](https://www.linkedin.com/in/darshit-khandelwal-49bb25288)
 - Built as part of the LFDT Mentorship Program application — 2026
@@ -456,9 +470,3 @@ This project serves as a reference implementation demonstrating that decentraliz
 This project is licensed under the Apache License 2.0 — see the [LICENSE](LICENSE) file for details.
 
 ---
-
-<div align="center">
-
-*Built with 🔐 cryptography, ☕ coffee, and a deep belief that open source deserves better identity infrastructure.*
-
-</div>

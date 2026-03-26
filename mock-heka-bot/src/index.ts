@@ -1,8 +1,7 @@
 import { Probot } from 'probot';
 import axios from 'axios';
 
-// ✅ FIX (Issue 2): Read Heka URL from environment so this works on any machine
-// Set HEKA_SERVICE_URL in your .env file
+// we set the Set HEKA_SERVICE_URL in your .env file
 const HEKA_URL = process.env.HEKA_SERVICE_URL || 'http://localhost:3000';
 
 export default (app: Probot) => {
@@ -26,15 +25,12 @@ export default (app: Probot) => {
       status: 'in_progress',
     });
 
-    // ✅ FIX (Bug 2): Separate Heka API call from GitHub Checks API call.
-    // Previously, if the checks.create() inside the try block threw an error,
-    // it would fall into catch and post a FAILURE — even if verification succeeded.
-    // Now we isolate the external call so errors are correctly attributed.
+    // storing the verification in a variable
     let verificationResult: { isValid: boolean; did?: string } = { isValid: false };
 
     try {
       // Now we connect with the Mock Heka Identity Server running on port 3000
-      // ✅ FIX (Issue 3): Added 5s timeout so a dead Heka service fails fast
+      // Another feature, got the tip to add from AI: Added 5s timeout so a dead Heka service fails fast
       // instead of hanging the webhook for 30 seconds until GitHub times it out
       const response = await axios.post(
         `${HEKA_URL}/verify`,
@@ -47,12 +43,11 @@ export default (app: Probot) => {
 
     } catch (error: any) {
       // This catch ONLY handles Heka API failures (network error, timeout, 404, etc.)
-      // It does NOT handle GitHub API errors
+      // It does not handle GitHub API errors
       app.log.error(`Heka API call failed for @${username}: ${error.message}`);
-      // verificationResult stays { isValid: false } — which is the correct safe default
+      // verificationResult stays { isValid: false } , as default value
     }
 
-    // Now handle the GitHub Check update in its own isolated block
     // The Heka might respond with valid or invalid
     if (verificationResult.isValid) {
       app.log.info(`✅ Successfully verified @${username}`);
@@ -66,14 +61,11 @@ export default (app: Probot) => {
         conclusion: 'success',
         output: {
           title: 'Contributor Verified ✅',
-          // ✅ FIX (Bug 3): Fixed malformed markdown — removed unclosed ** bold syntax
           summary: `Identity of **@${username}** has been verified cryptographically.\n\n**Decentralized Identifier (DID):** \`${verificationResult.did}\``,
         },
       });
 
     } else {
-      // ✅ FIX (Bug 1): This else block was missing entirely in the original code.
-      // Without it, unverified contributors left the PR stuck at "in_progress" forever.
       app.log.warn(`❌ Verification failed for @${username} — no valid credential found.`);
 
       // If the verification faced some issue, update the PR panel
