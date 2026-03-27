@@ -159,6 +159,8 @@ The following screenshots show the system running end-to-end on a real GitHub re
 
 ![alt text](image.png)
 
+
+
 ### Verified Contributor — PR Approved ✅
 
 > After onboarding, the contributor's DID appears in the PR check summary.
