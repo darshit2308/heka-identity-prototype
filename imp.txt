@@ -1,0 +1,14 @@
+1) curl http://localhost:3000/challenge/darshit2308
+2) Response: 
+{
+  "challenge": "8998b3d666a3301e7ac9b961eef73db3",
+  "command_to_run": "echo \"...\" | gpg --clearsign"
+}
+
+3) echo "challenge_string_enter" | gpg --clearsign > sig.txt
+
+4) node -e 'const fs = require("fs"); const sig = fs.readFileSync("sig.txt", "utf8"); fs.writeFileSync("payload.json", JSON.stringify({ github_username: "darshit2308", signature: sig }, null, 2));'
+
+5) curl -X POST http://localhost:3000/onboard \
+  -H "Content-Type: application/json" \
+  -d @payload.json
