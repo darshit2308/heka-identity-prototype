@@ -29,9 +29,9 @@ import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
  * 
  * Replace with persistent DB (e.g. PostgreSQL) in production.
  */
-const identityStore: Record<string, { 
-  did: string; 
-  vc: W3cJwtVerifiableCredential 
+const identityStore: Record<string, {
+  did: string;
+  vc: W3cJwtVerifiableCredential
 }> = {}
 
 /**
@@ -205,9 +205,15 @@ function setupRoutes(agent: Agent, issuerDid: string) {
       })
     }
 
-    // ✅ Check for already-onboarded user BEFORE the expensive GPG network call.
-    // If the user is already registered, we skip GitHub fetch + signature verification
-    // entirely and return their existing credential immediately.
+    // Now we check, if the decrypted message was equal to nonce
+    if (pendingChallenge.nonce != decrypted_challenge) {
+      return res.status(401).json({
+        error: 'Invalid challenge response. Decryption failed, or the decrypted message was wrong'
+      })
+    }
+    delete challengeStore[github_username]
+    console.log(`GPG authentication successfull for @${github_username} `)
+
     if (identityStore[github_username]) {
       delete challengeStore[github_username] // clean up the used challenge
       console.log(`ℹ️  @${github_username} is already onboarded. Returning existing credential.`)

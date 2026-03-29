@@ -12,3 +12,11 @@
 5) curl -X POST http://localhost:3000/onboard \
   -H "Content-Type: application/json" \
   -d @payload.json
+
+ check this command
+6) verify also
+curl -X POST http://localhost:3000/verify \
+  -H "Content-Type: application/json" \
+  -d '{"github_username": "YOUR_GITHUB_USERNAME"}'
+
+If you get `{ isValid: true }` at the end — Phase 0 Step 1 is done.
