@@ -6,6 +6,7 @@
 }
 
 3) echo "challenge_string_enter" | gpg --clearsign > sig.txt
+Note: Remove those '\'
 
 4) node -e 'const fs = require("fs"); const sig = fs.readFileSync("sig.txt", "utf8"); fs.writeFileSync("payload.json", JSON.stringify({ github_username: "darshit2308", signature: sig }, null, 2));'
 
