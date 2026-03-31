@@ -1,4 +1,14 @@
-1) curl http://localhost:3000/challenge/darshit2308
+Terminal 1 --> 
+mock-heka-credo => npm start
+
+Terminal 2 --> 
+ngrok http 3000 (at root directory)
+
+Terminal 3 --> 
+
+
+
+1) curl http://localhost:3000/challenge/darshit2308 (backend creates nonce, and sends to user )
 2) Response: 
 {
   "challenge": "8998b3d666a3301e7ac9b961eef73db3",
@@ -6,13 +16,16 @@
 }
 
 3) echo "challenge_string_enter" | gpg --clearsign > sig.txt
-Note: Remove those '\'
+    Note: Remove those '\' (here, user signs the nonce using private key)
 
 4) node -e 'const fs = require("fs"); const sig = fs.readFileSync("sig.txt", "utf8"); fs.writeFileSync("payload.json", JSON.stringify({ github_username: "darshit2308", signature: sig }, null, 2));'
 
 5) curl -X POST http://localhost:3000/onboard \
   -H "Content-Type: application/json" \
   -d @payload.json
+
+(user sends signature to backend, backend fetches public key from github, and verifies signature)
+
 
  check this command
 6) verify also
@@ -21,3 +34,18 @@ curl -X POST http://localhost:3000/verify \
   -d '{"github_username": "YOUR_GITHUB_USERNAME"}'
 
 If you get `{ isValid: true }` at the end — Phase 0 Step 1 is done.
+
+
+Terminal 4 --> 
+go to test repository
+echo "test" >> README.md
+git add .
+git commit -S -m "test commit"
+git push -u origin main
+
+
+
+
+If verification is successfule, DID is created, and then , VC is also created
+The local host is just on my laptop, so i wont be able to communicate with the github and webhooks, so
+we use a tunnel, like called as, ngrok, which makes our local host public.
