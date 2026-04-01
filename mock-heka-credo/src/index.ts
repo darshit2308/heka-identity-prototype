@@ -1,6 +1,7 @@
 import * as openpgp from 'openpgp'
 import axios from 'axios'
 import crypto from 'crypto'
+import Database from 'better-sqlite3';
 
 import '@hyperledger/aries-askar-nodejs'
 
@@ -9,6 +10,7 @@ import {
   Agent,
   InitConfig,
   KeyType,
+  ClaimFormat,
   W3cCredential,
   W3cCredentialSubject,
   JwaSignatureAlgorithm,
@@ -19,31 +21,55 @@ import { agentDependencies } from '@credo-ts/node'
 import { AskarModule } from '@credo-ts/askar'
 import { ariesAskar } from '@hyperledger/aries-askar-nodejs'
 
-/**
- * In-memory store for issued identities.
- * Key: github_username → Value: { did, vc (signed JWT credential) }
- * 
- * Typed as W3cJwtVerifiableCredential — the signed form returned by signCredential().
- * This is distinct from W3cCredential (the unsigned form). Using the wrong type
- * causes silent failures when verifyCredential() is called later.
- * 
- * Replace with persistent DB (e.g. PostgreSQL) in production.
- */
-const identityStore: Record<string, {
-  did: string;
-  vc: W3cJwtVerifiableCredential
-}> = {}
 
-/**
- * In-memory store for pending GPG authentication challenges.
- * Each entry is keyed by github_username and contains:
- * - nonce: the random string the user must sign with their GPG private key
- * - expiresAt: Unix timestamp after which the challenge is invalid
- * 
- * Challenges are single-use — deleted immediately after successful verification
- * to prevent replay attacks.
- */
-const challengeStore: Record<string, { nonce: string; expiresAt: number }> = {}
+// We have just replaced the in-memory storage from previous pushes, to this
+// updated sqlite databse. We are using sqlite, because it is lightweight and 
+// improves performance.
+
+// Initialize SQLite Database (this creates a file named 'heka.db' in your folder)
+const db = new Database('heka.db');
+
+// Enable WAL(Write ahead logging) mode for better performance
+db.pragma('journal_mode = WAL');
+
+// Create our tables if they don't exist yet
+db.exec(`
+  CREATE TABLE IF NOT EXISTS challenges (
+    github_username TEXT PRIMARY KEY,
+    nonce TEXT NOT NULL,
+    expires_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS identities (
+    github_username TEXT PRIMARY KEY,
+    did TEXT NOT NULL,
+    vc_jwt TEXT NOT NULL
+  );
+`);
+
+console.log('🗄️  SQLite Database initialized');
+
+function getStoredJwtCredential(storedValue: string): string {
+  try {
+    const parsedValue = JSON.parse(storedValue)
+
+    if (typeof parsedValue === 'string') {
+      return parsedValue
+    }
+
+    if (parsedValue?.jwt?.serializedJwt) {
+      return parsedValue.jwt.serializedJwt
+    }
+
+    if (parsedValue?.serializedJwt) {
+      return parsedValue.serializedJwt
+    }
+  } catch {
+    // Stored value is already a raw JWT string.
+  }
+
+  return storedValue
+}
 
 const app = express()
 app.use(express.json())
@@ -152,10 +178,10 @@ function setupRoutes(agent: Agent, issuerDid: string) {
 
     // Store the nonce server-side so we can verify the signature in /onboard.
     // The 5 minute expiry prevents stale challenges from being used later.
-    challengeStore[github_username] = {
-      nonce,
-      expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes from now
-    }
+    // Save challenge to SQLite database
+    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes from now
+    const insertChallenge = db.prepare('INSERT OR REPLACE INTO challenges (github_username, nonce, expires_at) VALUES (?, ?, ?)');
+    insertChallenge.run(github_username, nonce, expiresAt);
 
     console.log(`🎲 Challenge generated for @${github_username}`)
 
@@ -189,7 +215,7 @@ function setupRoutes(agent: Agent, issuerDid: string) {
     }
 
     // Fetch the pending challenge for this user
-    const pendingChallenge = challengeStore[github_username]
+    const pendingChallenge = db.prepare('SELECT * FROM challenges WHERE github_username = ?').get(github_username) as any;
 
     if (!pendingChallenge) {
       return res.status(401).json({
@@ -198,21 +224,26 @@ function setupRoutes(agent: Agent, issuerDid: string) {
     }
 
     // Check if the challenge has expired
-    if (Date.now() > pendingChallenge.expiresAt) {
-      delete challengeStore[github_username] // clean up the expired entry
+    // Check if the challenge has expired (Note the database column name is expires_at)
+    if (Date.now() > pendingChallenge.expires_at) {
+      db.prepare('DELETE FROM challenges WHERE github_username = ?').run(github_username);
       return res.status(401).json({
         error: 'Challenge expired. Please request a new one.',
       })
     }
 
 
-    if (identityStore[github_username]) {
-      delete challengeStore[github_username] // clean up the used challenge
+    // Check database for existing identity
+    const existingIdentity = db.prepare('SELECT * FROM identities WHERE github_username = ?').get(github_username) as any;
+    
+    if (existingIdentity) {
+      db.prepare('DELETE FROM challenges WHERE github_username = ?').run(github_username);
       console.log(`ℹ️  @${github_username} is already onboarded. Returning existing credential.`)
+      const serializedJwt = getStoredJwtCredential(existingIdentity.vc_jwt)
       return res.json({
         message: 'Already onboarded. Returning existing credential.',
-        did: identityStore[github_username].did,
-        credential: identityStore[github_username].vc,
+        did: existingIdentity.did,
+        credential: W3cJwtVerifiableCredential.fromSerializedJwt(serializedJwt),
       })
     }
 
@@ -277,7 +308,7 @@ function setupRoutes(agent: Agent, issuerDid: string) {
     }
 
     // GPG ownership proven — consume the challenge to prevent replay attacks
-    delete challengeStore[github_username]
+    db.prepare('DELETE FROM challenges WHERE github_username = ?').run(github_username);
     console.log(`✅ GPG ownership verified for @${github_username}`)
 
     try {
@@ -306,9 +337,9 @@ function setupRoutes(agent: Agent, issuerDid: string) {
       // Step 3: Sign a W3C Verifiable Credential using the issuer's Ed25519 private key.
       // The credential is serialised as a JWT (jwt_vc format) — a compact, URL-safe token
       // that can be verified by anyone who resolves the issuer's DID to get the public key.
-      const credential = await agent.w3cCredentials.signCredential({
+      const credential = await agent.w3cCredentials.signCredential<ClaimFormat.JwtVc>({
         credential: new W3cCredential({
-          contexts: ['https://www.w3.org/2018/credentials/v1'],
+          context: ['https://www.w3.org/2018/credentials/v1'],
           type: ['VerifiableCredential', 'GithubContributorCredential'],
           issuer: issuerDid,
           issuanceDate: new Date().toISOString(),
@@ -324,16 +355,12 @@ function setupRoutes(agent: Agent, issuerDid: string) {
         }),
         verificationMethod,
         alg: JwaSignatureAlgorithm.EdDSA,
-        format: 'jwt_vc',
+        format: ClaimFormat.JwtVc,
       })
 
-      // Step 4: Store the DID and signed VC in the mock cloud wallet for fast lookup.
-      // Cast to W3cJwtVerifiableCredential — signCredential() returns the union type
-      // W3cVerifiableCredential, but format: 'jwt_vc' guarantees the JWT subtype.
-      identityStore[github_username] = {
-        did: userDid,
-        vc: credential as W3cJwtVerifiableCredential,
-      }
+      // Step 4: Store the DID and signed VC in the SQLite database for permanent lookup.
+      const insertIdentity = db.prepare('INSERT OR REPLACE INTO identities (github_username, did, vc_jwt) VALUES (?, ?, ?)');
+      insertIdentity.run(github_username, userDid, credential.serializedJwt);
 
       console.log(`🎉 Onboarding complete for @${github_username}`)
 
@@ -382,7 +409,7 @@ function setupRoutes(agent: Agent, issuerDid: string) {
     console.log(`\n🔍 Verifying credential for: @${github_username}`)
 
     // Look up the contributor's credential in the mock cloud wallet
-    const userRecord = identityStore[github_username]
+    const userRecord = db.prepare('SELECT * FROM identities WHERE github_username = ?').get(github_username) as any;
     if (!userRecord) {
       return res.status(404).json({
         isValid: false,
@@ -391,8 +418,9 @@ function setupRoutes(agent: Agent, issuerDid: string) {
     }
 
     try {
+      const serializedJwt = getStoredJwtCredential(userRecord.vc_jwt)
       const verificationResult = await agent.w3cCredentials.verifyCredential({
-        credential: userRecord.vc,
+        credential: serializedJwt,
       })
 
       if (verificationResult.isValid) {
