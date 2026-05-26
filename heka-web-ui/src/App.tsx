@@ -456,7 +456,7 @@ export default function App() {
                   </div>
                   <div className="rm-content">
                     <div className="rm-when">Next · Planned</div>
-                    <p>Swap <code>did:key</code> for public <code>did:hedera</code> anchor on testnet.</p>
+                    <p>Swap <code>did:key</code> for public <code>did:hedera</code> anchor on testnet. (Standalone Spike Complete ✅)</p>
                   </div>
                 </div>
                 <div className="roadmap-item rm-then">

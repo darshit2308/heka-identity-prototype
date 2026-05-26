@@ -22,7 +22,7 @@ This is a **working prototype** that demonstrates the end-to-end contributor ide
 - No integration test coverage (unit tests only)
 - SQLite used as identity store (not suitable for multi-instance deployment)
 - No credential revocation mechanism
-- No DID anchoring on Hedera (uses `did:key` placeholder)
+- Main MVP still uses `did:key`, but a standalone Hedera testnet anchoring spike has been implemented and verified.
 - No audit logging for onboarding or verification events
 - Console-based logging rather than structured log library
 

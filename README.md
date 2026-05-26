@@ -615,7 +615,7 @@ The items below are **not implemented in the current prototype**. They are the g
 | OID4VCI issuance flow            | Not implemented                                       | Standards-based credential issuance into the contributor wallet                    |
 | OID4VP presentation flow         | Not implemented                                       | The contributor wallet presents a Verifiable Presentation to the verifier          |
 | Linked VP in DID Document        | Not implemented                                       | A linked VP can be used to simplify verification                                   |
-| Hedera DID anchoring             | Not implemented                                       | `did:hedera` anchored on Hedera Testnet/Mainnet                                    |
+| Hedera DID anchoring             | Spike completed (`spikes/hedera-did-anchor`)          | `did:hedera` anchored on Hedera Testnet/Mainnet                                    |
 | SD-JWT VC format                 | Not implemented                                       | Privacy-preserving SD-JWT VC presentation                                          |
 | VC revocation registry           | Not implemented                                       | A revocation mechanism for invalid or compromised credentials                      |
 | Credential lifecycle management  | Not implemented                                       | Rotation, revocation, and lifecycle policies                                       |
@@ -653,10 +653,11 @@ It does **not** yet prove the mentorship target's full self-sovereign wallet mod
 
 The following roadmap items represent the next phase of development beyond the current MVP. They are intentionally **not done yet** in this repository:
 
-1. **`did:hedera` Testnet Anchor** (🎯 **Next Major Milestone**)
+1. **`did:hedera` Testnet Anchor** (✅ **Spike Completed**)
    - Replace `did:key` with `did:hedera` using Hiero DID SDK / Heka's existing Credo Hedera integration
    - Anchor both issuer and user DIDs on Hedera Testnet for public auditability and immutability
    - Integrate with Hedera's DID Method specification for production readiness
+   - *Note: Main MVP still uses `did:key`, but a standalone Hedera testnet anchoring spike has been implemented and verified.*
 
 2. **SD-JWT Selective Disclosure**
    - Contributors can prove specific claims without revealing full identity profile
