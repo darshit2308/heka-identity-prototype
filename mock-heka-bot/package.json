@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "start": "probot run ./lib/index.js",
-    "test": "vitest"
+    "test": "vitest run"
   },
   "dependencies": {
     "axios": "^1.14.0",

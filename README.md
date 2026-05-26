@@ -573,7 +573,8 @@ W3C VC signed with issuer's Ed25519 private key
     "credentialSubject": {
       "id": "did:key:z6Mk[user]",
       "github_username": "darshit2308",
-      "is_verified": true
+      "is_verified": true,
+      "gpg_fingerprint": "8998b3d666a3301e7ac9b961eef73db3"
     }
   }
          │
@@ -653,7 +654,7 @@ It does **not** yet prove the mentorship target's full self-sovereign wallet mod
 The following roadmap items represent the next phase of development beyond the current MVP. They are intentionally **not done yet** in this repository:
 
 1. **`did:hedera` Testnet Anchor** (🎯 **Next Major Milestone**)
-   - Replace `did:key` with `did:hedera` using `@hashgraph/did-sdk`
+   - Replace `did:key` with `did:hedera` using Hiero DID SDK / Heka's existing Credo Hedera integration
    - Anchor both issuer and user DIDs on Hedera Testnet for public auditability and immutability
    - Integrate with Hedera's DID Method specification for production readiness
 
