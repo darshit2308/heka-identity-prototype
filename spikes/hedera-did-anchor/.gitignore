@@ -1,0 +1,15 @@
+# Spike-local gitignore
+# Never commit live credentials or the real evidence file with your DID private key data.
+
+# Real .env with operator credentials
+.env
+
+# Generated DID owner private key (sensitive — identity control key)
+.local/
+
+# Live evidence JSON (contains real DID — commit only after redacting if desired)
+evidence/hedera-did-anchor.json
+
+# Compiled output
+lib/
+node_modules/

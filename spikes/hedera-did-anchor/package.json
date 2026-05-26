@@ -1,0 +1,26 @@
+{
+  "name": "hedera-did-anchor-spike",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Spike: create and resolve a real did:hedera on Hedera testnet using Hiero DID SDK",
+  "type": "module",
+  "scripts": {
+    "create": "tsx src/create-contributor-did.ts",
+    "resolve": "tsx src/resolve-did.ts"
+  },
+  "dependencies": {
+    "@hiero-did-sdk/core": "0.2.0",
+    "@hiero-did-sdk/registrar": "0.2.0",
+    "@hiero-did-sdk/resolver": "0.2.0",
+    "@hiero-ledger/sdk": "^2.84.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">= 18"
+  }
+}
