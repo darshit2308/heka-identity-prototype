@@ -1,18 +1,10 @@
-// You can import your modules
-// import index from '../src/index'
-
 import nock from "nock";
-// Requiring our app implementation
 import myProbotApp from "../src/index.js";
 import { Probot, ProbotOctokit } from "probot";
-// Requiring our fixtures
-//import payload from "./fixtures/issues.opened.json" with { "type": "json"};
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { describe, beforeEach, afterEach, test, expect } from "vitest";
-
-const issueCreatedBody = { body: "Thanks for opening this issue!" };
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,10 +14,13 @@ const privateKey = fs.readFileSync(
 );
 
 const payload = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "fixtures/issues.opened.json"), "utf-8"),
+  fs.readFileSync(
+    path.join(__dirname, "fixtures/pull_request.opened.json"),
+    "utf-8",
+  ),
 );
 
-describe("My Probot app", () => {
+describe("Heka Identity Verification Bot", () => {
   let probot: any;
 
   beforeEach(() => {
@@ -33,38 +28,92 @@ describe("My Probot app", () => {
     probot = new Probot({
       appId: 123,
       privateKey,
-      // disable request throttling and retries for testing
       Octokit: ProbotOctokit.defaults({
         retry: { enabled: false },
         throttle: { enabled: false },
       }),
     });
-    // Load our app into probot
     probot.load(myProbotApp);
   });
 
-  test("creates a comment when an issue is opened", async () => {
+  test("creates a success check when Heka returns a valid credential", async () => {
     const mock = nock("https://api.github.com")
-      // Test that we correctly return a test token
+      // Probot requests an installation access token
       .post("/app/installations/2/access_tokens")
       .reply(200, {
         token: "test",
-        permissions: {
-          issues: "write",
-        },
+        permissions: { checks: "write" },
       })
 
-      // Test that a comment is posted
-      .post("/repos/hiimbex/testing-things/issues/1/comments", (body: any) => {
-        expect(body).toMatchObject(issueCreatedBody);
+      // First check: in_progress
+      .post("/repos/test-org/test-repo/check-runs", (body: any) => {
+        expect(body.name).toBe("Heka Identity Verification");
+        expect(body.head_sha).toBe("abc123def456");
+        expect(body.status).toBe("in_progress");
         return true;
       })
-      .reply(200);
+      .reply(201)
 
-    // Receive a webhook event
-    await probot.receive({ name: "issues", payload });
+      // Second check: completed + success
+      .post("/repos/test-org/test-repo/check-runs", (body: any) => {
+        expect(body.name).toBe("Heka Identity Verification");
+        expect(body.status).toBe("completed");
+        expect(body.conclusion).toBe("success");
+        expect(body.output.title).toContain("Verified");
+        return true;
+      })
+      .reply(201);
+
+    // Mock the Heka identity service returning a valid credential
+    const hekaMock = nock("http://localhost:3000")
+      .post("/verify", { github_username: "test-contributor" })
+      .reply(200, {
+        isValid: true,
+        did: "did:key:z6MkTestContributorDid123",
+      });
+
+    await probot.receive({ name: "pull_request", payload });
 
     expect(mock.pendingMocks()).toStrictEqual([]);
+    expect(hekaMock.pendingMocks()).toStrictEqual([]);
+  });
+
+  test("creates a failure check when Heka returns an invalid credential", async () => {
+    const mock = nock("https://api.github.com")
+      // Probot requests an installation access token
+      .post("/app/installations/2/access_tokens")
+      .reply(200, {
+        token: "test",
+        permissions: { checks: "write" },
+      })
+
+      // First check: in_progress
+      .post("/repos/test-org/test-repo/check-runs", (body: any) => {
+        expect(body.status).toBe("in_progress");
+        return true;
+      })
+      .reply(201)
+
+      // Second check: completed + failure
+      .post("/repos/test-org/test-repo/check-runs", (body: any) => {
+        expect(body.status).toBe("completed");
+        expect(body.conclusion).toBe("failure");
+        expect(body.output.title).toContain("Unverified");
+        return true;
+      })
+      .reply(201);
+
+    // Mock the Heka identity service returning no valid credential
+    const hekaMock = nock("http://localhost:3000")
+      .post("/verify", { github_username: "test-contributor" })
+      .reply(200, {
+        isValid: false,
+      });
+
+    await probot.receive({ name: "pull_request", payload });
+
+    expect(mock.pendingMocks()).toStrictEqual([]);
+    expect(hekaMock.pendingMocks()).toStrictEqual([]);
   });
 
   afterEach(() => {
@@ -72,12 +121,3 @@ describe("My Probot app", () => {
     nock.enableNetConnect();
   });
 });
-
-// For more information about testing with Jest see:
-// https://facebook.github.io/jest/
-
-// For more information about using TypeScript in your tests, Jest recommends:
-// https://github.com/kulshekhar/ts-jest
-
-// For more information about testing with Nock see:
-// https://github.com/nock/nock

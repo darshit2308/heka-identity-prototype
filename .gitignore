@@ -1,0 +1,16 @@
+# SQLite database files (generated at runtime)
+*.db
+*.db-shm
+*.db-wal
+
+# Local testing artifacts
+payload.json
+sig.txt
+allfiles.txt
+
+# Environment and secrets
+.env
+*.pem
+
+# OS junk
+.DS_Store

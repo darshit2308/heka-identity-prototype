@@ -39,7 +39,8 @@ export class CredentialService {
   async issueCredential(
     userDid: string,
     github_username: string,
-    issuerDid: string
+    issuerDid: string,
+    gpg_fingerprint: string
   ): Promise<W3cJwtVerifiableCredential> {
     // Step 1: Build the verification method URL for the issuer.
     // For did:key, the verification method URL format is:
@@ -61,6 +62,7 @@ export class CredentialService {
           // to survive the JWT serialisation and properly map to the subject.
           claims: {
             github_username: github_username,
+            gpg_fingerprint: gpg_fingerprint,
             is_verified: true,
           },
         }),

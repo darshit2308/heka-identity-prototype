@@ -110,4 +110,19 @@ export class GPGService {
       throw new Error(`Signature verification failed: ${error.message}`)
     }
   }
+
+  /**
+   * Extract the GPG key fingerprint from the user's public key.
+   * The fingerprint is a unique identifier for the key and will be
+   * included in the Verifiable Credential to cryptographically link
+   * the contributor's GPG key to their decentralized identity.
+   */
+  async getFingerprint(armoredKeys: string): Promise<string> {
+    const keys = await openpgp.readKeys({ armoredKeys })
+    if (!keys || keys.length === 0) {
+      throw new Error('No valid GPG keys found')
+    }
+    // Return the fingerprint of the primary key (uppercase hex)
+    return keys[0].getFingerprint().toUpperCase()
+  }
 }

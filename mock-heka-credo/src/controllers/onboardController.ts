@@ -50,21 +50,9 @@ export function createOnboardController(
         })
       }
 
-      // Check database for existing identity
-      const existingIdentity = identityService.getIdentity(github_username)
-
-      if (existingIdentity) {
-        identityService.deleteChallenge(github_username)
-        console.log(`ℹ️  @${github_username} is already onboarded. Returning existing credential.`)
-        const serializedJwt = getStoredJwtCredential(existingIdentity.vc_jwt)
-        return res.json({
-          message: 'Already onboarded. Returning existing credential.',
-          did: existingIdentity.did,
-          credential: W3cJwtVerifiableCredential.fromSerializedJwt(serializedJwt),
-        })
-      }
-
-      // Verify the GPG signature against the public key from GitHub
+      // Verify the GPG signature against the public key from GitHub.
+      // This MUST happen before any credential is returned — even for existing users —
+      // to prevent someone from claiming an existing identity without proving key ownership.
       const armoredKeys = await gpgService.getGitHubPublicGPGKey(github_username)
       await gpgService.verifySignature(armoredKeys, signature, pendingChallenge.nonce)
 
@@ -72,15 +60,34 @@ export function createOnboardController(
       identityService.deleteChallenge(github_username)
       console.log(`✅ GPG ownership verified for @${github_username}`)
 
+      // Check database for existing identity (after signature verification)
+      const existingIdentity = identityService.getIdentity(github_username)
+
+      if (existingIdentity) {
+        console.log(`ℹ️  @${github_username} is already onboarded. Returning existing credential.`)
+        const serializedJwt = getStoredJwtCredential(existingIdentity.vc_jwt)
+        return res.json({
+          message: 'Already onboarded. GPG ownership re-verified. Returning existing credential.',
+          did: existingIdentity.did,
+          credential: W3cJwtVerifiableCredential.fromSerializedJwt(serializedJwt),
+        })
+      }
+
       // Step 1: Create a unique did:key DID for this contributor.
       const userDid = await credentialService.createUserDid()
       console.log(`🔑 User DID created: ${userDid}`)
+
+      // Step 1.5: Extract GPG fingerprint to embed in the credential.
+      // The armoredKeys are already fetched from the signature verification step.
+      const gpgFingerprint = await gpgService.getFingerprint(armoredKeys)
+      console.log(`🔏 GPG fingerprint: ${gpgFingerprint}`)
 
       // Step 2: Issue a W3C Verifiable Credential
       const credential = await credentialService.issueCredential(
         userDid,
         github_username,
-        issuerDid
+        issuerDid,
+        gpgFingerprint
       )
 
       // Step 3: Store the DID and signed VC in the SQLite database for permanent lookup.
