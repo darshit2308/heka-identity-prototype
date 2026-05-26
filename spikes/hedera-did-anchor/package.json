@@ -5,6 +5,7 @@
   "description": "Spike: create and resolve a real did:hedera on Hedera testnet using Hiero DID SDK",
   "type": "module",
   "scripts": {
+    "postinstall": "node scripts/patch-sdk-exports.cjs",
     "create": "tsx src/create-contributor-did.ts",
     "resolve": "tsx src/resolve-did.ts"
   },

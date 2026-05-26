@@ -25,7 +25,7 @@
 import 'dotenv/config'
 import fs from 'node:fs'
 import path from 'node:path'
-import { Client } from '@hiero-ledger/sdk'
+import { Client, AccountBalanceQuery } from '@hiero-ledger/sdk'
 import { createDID } from '@hiero-did-sdk/registrar'
 import { resolveDID } from '@hiero-did-sdk/resolver'
 import { parseDID } from '@hiero-did-sdk/core'
@@ -52,8 +52,39 @@ console.log()
 
 // ── 2. Build Hedera client ────────────────────────────────────────────────────
 
-const client = Client.forName(network)
+const client = network === 'testnet' ? Client.forTestnet() : Client.forName(network)
 client.setOperator(accountId, privateKey)
+
+// Increase default gRPC timeout from 10s to 30s — testnet nodes can be slow
+client.setRequestTimeout(30_000)
+// Use TLS transport — helps bypass firewalls that block plaintext gRPC on port 50211
+client.setTransportSecurity(true)
+
+// ── 2a. Pre-flight connectivity check ─────────────────────────────────────────
+
+console.log('Testing gRPC connectivity to Hedera testnet...')
+try {
+  const balance = await new AccountBalanceQuery()
+    .setAccountId(accountId)
+    .execute(client)
+  console.log(`Connected. Account balance: ${balance.hbars.toString()}`)
+  console.log()
+} catch (err: unknown) {
+  const msg = err instanceof Error ? err.message : String(err)
+  console.error('Failed to connect to Hedera testnet gRPC nodes.')
+  console.error(`Error: ${msg}`)
+  console.error()
+  console.error('Possible causes:')
+  console.error('  1. Your network/firewall is blocking gRPC (ports 50211/50212)')
+  console.error('  2. The Hedera testnet nodes are temporarily down')
+  console.error('  3. Your operator credentials are invalid')
+  console.error()
+  console.error('Try:')
+  console.error('  - Switch to a different WiFi or use a hotspot')
+  console.error('  - Disable VPN if active')
+  console.error('  - Check https://status.hedera.com for testnet status')
+  process.exit(1)
+}
 
 // ── 3. Build evidence scaffold ────────────────────────────────────────────────
 
