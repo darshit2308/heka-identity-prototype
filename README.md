@@ -2,7 +2,7 @@
 
 ### Decentralized Contributor Identity Verification for Open Source
 
-_A working prototype built for the [LF Decentralized Trust Mentorship Program — Issue #87](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87)_
+_A working prototype selected for the [LF Decentralized Trust Mentorship Program — Issue #87](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87)_
 
 ---
 
@@ -683,7 +683,7 @@ The following roadmap items represent the next phase of development beyond the c
 
 ## 🤝 Relation to LFDT and Hiero
 
-This prototype is built as a pre-application MVP for the **LF Decentralized Trust Mentorship Program (LFDT-2026)**, specifically [Issue #87 — Hiero: Contributor Identity Verification Prototype](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87).
+This prototype is built to be used for moving the components and functionalites directly into the heka repo during the mentorship.
 
 The architecture is designed to integrate with:
 
@@ -701,7 +701,6 @@ This project serves as a reference implementation demonstrating that decentraliz
 
 - GitHub: [@darshit2308](https://github.com/darshit2308)
 - LinkedIn: [darshit-khandelwal](https://www.linkedin.com/in/darshit-khandelwal-49bb25288)
-- Built as part of the LFDT Mentorship Program application — 2026
 
 ---
 
@@ -710,9 +709,3 @@ This project serves as a reference implementation demonstrating that decentraliz
 This project is licensed under the Apache License 2.0 — see the [LICENSE](LICENSE) file for details.
 
 ---
-
-<div align="center">
-
-_Built with 🔐 cryptography, ☕ coffee, and a deep belief that open source deserves better identity infrastructure._
-
-</div>
