@@ -2,7 +2,7 @@
 
 ### Decentralized Contributor Identity Verification for Open Source
 
-_A working prototype selected for the [LF Decentralized Trust Mentorship Program — Issue #87](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87)_
+_A working prototype built for and selected by the [LF Decentralized Trust Mentorship Program — Issue #87](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87)_
 
 ---
 
@@ -15,9 +15,7 @@ _A working prototype selected for the [LF Decentralized Trust Mentorship Program
 ![GPG](https://img.shields.io/badge/Auth-GPG_Sign%2FVerify-4A90D9?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue?style=for-the-badge)
 
-<br/> 
-
-</div>
+<br/>
 
 ---
 
@@ -25,10 +23,10 @@ _A working prototype selected for the [LF Decentralized Trust Mentorship Program
 
 Open source contribution platforms like GitHub rely on email addresses and usernames for contributor attribution. This trust model has three fundamental weaknesses:
 
-| Weakness                | Reality                                                                                           |
-| ----------------------- | ------------------------------------------------------------------------------------------------- |
-| **Identity Spoofing**   | Anyone can set `git config user.email linus@kernel.org` and commit as Linus Torvalds              |
-| **Fragmented Identity** | A contributor's reputation is siloed per-platform with no portable proof                          |
+| Weakness | Reality |
+| --- | --- |
+| **Identity Spoofing** | Anyone can set `git config user.email linus@kernel.org` and commit as Linus Torvalds |
+| **Fragmented Identity** | A contributor's reputation is siloed per-platform with no portable proof |
 | **Agentic AI Flooding** | AI agents can now impersonate developers and flood repositories with low-quality or malicious PRs |
 
 These risks are not hypothetical. As open source becomes critical infrastructure, the integrity of who contributes what becomes a security concern — not just a social one.
@@ -50,15 +48,16 @@ When a contributor opens a Pull Request, the system doesn't ask _"who does GitHu
 
 ## 🎯 Implemented Features (MVP)
 
-| Feature                        | Status  | Description                                                                                               |
-| ------------------------------ | ------- | --------------------------------------------------------------------------------------------------------- |
-| **React Onboarding Console**   | ✅ Live | Modern web UI replacing terminal CURL commands for contributor onboarding                                 |
-| **GPG Challenge-Response**     | ✅ Live | Cryptographic proof of GitHub GPG key ownership before VC issuance — private key never leaves the machine |
-| **SQLite Persistent Storage**  | ✅ Live | Challenges, credentials, and identities survive server restarts using a lightweight embedded database     |
-| **GitHub App (Probot)**        | ✅ Live | Intercepts PR events and blocks unverified contributors automatically based on SQLite credential state    |
-| **W3C Verifiable Credentials** | ✅ Live | Tamper-proof, digitally signed identity certificates issued by the Heka Issuer                            |
-| **Decentralized Identifiers**  | ✅ Live | Self-sovereign DIDs (`did:key`) for portable, platform-independent identity anchors                       |
-| **Credo-ts Integration**       | ✅ Live | Production-grade identity framework compatible with Heka Identity Platform                                |
+| Feature | Status | Description |
+| --- | --- | --- |
+| **React Onboarding Console** | ✅ Live | Modern web UI replacing terminal CURL commands for contributor onboarding |
+| **GPG Challenge-Response** | ✅ Live | Cryptographic proof of GitHub GPG key ownership before VC issuance — private key never leaves the machine |
+| **SQLite Persistent Storage** | ✅ Live | Challenges, credentials, and identities survive server restarts using a lightweight embedded database |
+| **GitHub App (Probot)** | ✅ Live | Intercepts PR events and blocks unverified contributors automatically based on SQLite credential state |
+| **W3C Verifiable Credentials** | ✅ Live | Tamper-proof, digitally signed identity certificates issued by the Heka Issuer |
+| **Decentralized Identifiers** | ✅ Live | Self-sovereign DIDs (`did:key`) for portable, platform-independent identity anchors |
+| **Credo-ts Integration** | ✅ Live | Production-grade identity framework compatible with Heka Identity Platform |
+| **Hedera DID Spike** | ✅ Spike | `did:hedera` creation and resolution verified on Hedera testnet (`spikes/hedera-did-anchor`) |
 
 ---
 
@@ -104,15 +103,15 @@ When a contributor opens a Pull Request, the system doesn't ask _"who does GitHu
 
 ### Component Breakdown
 
-| Component         | Technology                   | Role                                                          |
-| ----------------- | ---------------------------- | ------------------------------------------------------------- |
+| Component | Technology | Role |
+| --- | --- | --- |
 | `mock-heka-credo` | Node.js + Credo-ts + Express | Identity Issuer — GPG verification, DID creation, VC issuance |
-| `mock-heka-bot`   | Probot + TypeScript          | GitHub App — webhook listener, PR enforcement                 |
-| Askar Wallet      | `@hyperledger/aries-askar`   | Secure key management and cryptographic operations            |
-| DID Method        | `did:key` (Ed25519)          | Portable, self-sovereign decentralized identifier             |
-| Credential Format | W3C VC / JWT (`jwt_vc`)      | Tamper-proof signed identity certificate                      |
-| GPG Auth          | OpenPGP.js                   | Cryptographic proof of GitHub key ownership                   |
-| Webhook Tunnel    | Smee.io                      | Routes GitHub webhook events to local development server      |
+| `mock-heka-bot` | Probot + TypeScript | GitHub App — webhook listener, PR enforcement |
+| Askar Wallet | `@hyperledger/aries-askar` | Secure key management and cryptographic operations |
+| DID Method | `did:key` (Ed25519) | Portable, self-sovereign decentralized identifier |
+| Credential Format | W3C VC / JWT (`jwt_vc`) | Tamper-proof signed identity certificate |
+| GPG Auth | OpenPGP.js | Cryptographic proof of GitHub key ownership |
+| Webhook Tunnel | Smee.io | Routes GitHub webhook events to local development server |
 
 ---
 
@@ -170,8 +169,6 @@ Contributor                      Heka Identity Service
 
 _This demo showcases the complete MVP including the React Web UI, GPG challenge-response flow, SQLite persistence, and GitHub App enforcement._
 
-The following screenshots show the system running end-to-end on a real GitHub repository.
-
 ### Unverified Contributor — PR Blocked ❌
 
 > A PR opened by a contributor who has not onboarded with Heka receives an automatic failure check.
@@ -190,31 +187,17 @@ The following screenshots show the system running end-to-end on a real GitHub re
 
 ### React Web UI Console
 
-This screenshot shows the onboarding interface used to submit a GPG signature and receive DID/VC output.
-
 <img width="800" alt="React Web UI Console" src="https://github.com/user-attachments/assets/f457ae48-5bf9-47d2-b9d9-0fd8d0682ef5" style="max-width: 100%; height: auto;" />
-
----
 
 ### SQLite Schema Diagram
 
-This diagram shows how onboarding challenges and issued identities are persisted in SQLite.
-
 <img width="800" alt="SQLite Schema" src="https://github.com/user-attachments/assets/32130ab0-ecce-4714-93c9-ca93e22cb91f" style="max-width: 100%; height: auto;" />
-
----
 
 ### Component Interaction Diagram
 
-This flow shows request and verification movement between UI, issuer service, wallet, database, bot, and GitHub.
-
 <img width="800" alt="Component Interaction" src="https://github.com/user-attachments/assets/c98f1a53-932c-45c3-9442-68a84424961b" style="max-width: 100%; height: auto;" />
 
----
-
 ### Cryptographic Verification Flow
-
-This flow visualizes how GPG proof is transformed into a signed verifiable credential used for PR enforcement.
 
 <img width="800" alt="Crypto Verification Flow" src="https://github.com/user-attachments/assets/33fb2b37-d55a-4bf1-92ac-7fa43461a21a" style="max-width: 100%; height: auto;" />
 
@@ -224,13 +207,13 @@ This flow visualizes how GPG proof is transformed into a signed verifiable crede
 
 ### Prerequisites
 
-| Requirement    | Version                                                                                                                                                                  |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Node.js        | **v20.x LTS only** (v18.x also works — v21+ is NOT supported due to native Askar bindings)                                                                               |
-| npm            | v9+                                                                                                                                                                      |
-| GPG Key        | Must be added to your GitHub account ([guide](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)) |
-| GitHub Account | Required to install the GitHub App                                                                                                                                       |
-| Smee.io        | Free — no account needed                                                                                                                                                 |
+| Requirement | Version |
+| --- | --- |
+| Node.js | **v20.x LTS only** (v18.x also works — v21+ is NOT supported due to native Askar bindings) |
+| npm | v9+ |
+| GPG Key | Must be added to your GitHub account ([guide](https://docs.github.com/en/authentication/managing-commit-signature-verification/adding-a-gpg-key-to-your-github-account)) |
+| GitHub Account | Required to install the GitHub App |
+| Smee.io | Free — no account needed |
 
 ---
 
@@ -242,7 +225,7 @@ npm install
 npm run dev
 ```
 
-The React UI will start at `http://localhost:5173` and provides a modern alternative to the terminal-based onboarding flow. You can use this console to submit GPG signatures and receive credentials via a web interface.
+The React UI will start at `http://localhost:5173`.
 
 ---
 
@@ -320,8 +303,6 @@ npm start
 
 ### Step 4 — Onboard as a Verified Contributor (GPG Proof Flow)
 
-This is the core of the system. You will prove ownership of your GitHub GPG key without ever sending your private key anywhere.
-
 **4a — Request your challenge nonce:**
 
 ```bash
@@ -341,11 +322,10 @@ Response:
 **4b — Sign the nonce with your GPG private key:**
 
 ```bash
-# Copy the exact nonce from the response (remove any backslashes)
 echo "8998b3d666a3301e7ac9b961eef73db3" | gpg --clearsign > sig.txt
 ```
 
-This produces a PGP signed message block in `sig.txt`. Your private key **never leaves your machine**.
+Your private key **never leaves your machine**.
 
 **4c — Build the request payload:**
 
@@ -377,8 +357,6 @@ Expected response:
   "credential": "eyJhbGciOiJFZERTQSJ9..."
 }
 ```
-
-The `credential` field is a signed JWT — a W3C Verifiable Credential cryptographically bound to your GitHub identity.
 
 ---
 
@@ -420,7 +398,7 @@ heka-identity-prototype/
 │   │   └── styles.css            # UI styling
 │   ├── index.html
 │   ├── package.json
-│   ├── vite.config.ts            # Vite build configuration
+│   ├── vite.config.ts
 │   └── tsconfig.json
 │
 ├── mock-heka-credo/              # Identity Issuer Service
@@ -429,7 +407,7 @@ heka-identity-prototype/
 │   │   ├── database/
 │   │   │   └── db.ts             # SQLite database initialization
 │   │   ├── config/
-│   │   │   └── env.ts            # Environment configuration
+│   │   │   └── env.ts
 │   │   ├── handlers/
 │   │   │   └── pullRequestHandler.ts
 │   │   ├── services/
@@ -454,9 +432,11 @@ heka-identity-prototype/
 │   │   │   ├── onboardController.ts
 │   │   │   ├── statusController.ts
 │   │   │   └── verifyController.ts
-│   │   │
 │   ├── .env.example
 │   └── package.json
+│
+├── spikes/
+│   └── hedera-did-anchor/        # ✅ Verified: did:hedera creation + resolution on testnet
 │
 └── README.md
 ```
@@ -467,61 +447,12 @@ heka-identity-prototype/
 
 ### Identity Service (`mock-heka-credo`) — Port 3000
 
-| Method | Endpoint               | Description                                                 |
-| ------ | ---------------------- | ----------------------------------------------------------- |
-| `GET`  | `/status`              | Health check — returns issuer DID                           |
-| `GET`  | `/challenge/:username` | Step 1 — generate nonce for GPG signing                     |
-| `POST` | `/onboard`             | Step 2 — verify GPG signature + issue Verifiable Credential |
-| `POST` | `/verify`              | Cryptographically verify a contributor's credential         |
-
----
-
-**`GET /challenge/:username`**
-
-```bash
-curl http://localhost:3000/challenge/darshit2308
-
-# Response
-{
-  "message": "Sign this nonce using your GPG key...",
-  "challenge": "8998b3d666a3301e7ac9b961eef73db3",
-  "command_to_run": "echo \"8998b3d...\" | gpg --clearsign"
-}
-```
-
----
-
-**`POST /onboard`**
-
-```json
-// Request
-{
-  "github_username": "darshit2308",
-  "signature": "-----BEGIN PGP SIGNED MESSAGE-----\nHash: SHA256\n\n8998b3d...\n-----BEGIN PGP SIGNATURE-----\n..."
-}
-
-// Response
-{
-  "message": "Onboarding successful. Verifiable Credential issued.",
-  "did": "did:key:z6MkrJ...",
-  "credential": "<signed JWT>"
-}
-```
-
----
-
-**`POST /verify`**
-
-```json
-// Request
-{ "github_username": "darshit2308" }
-
-// Response — verified
-{ "status": "verified", "isValid": true, "did": "did:key:z6MkrJ..." }
-
-// Response — not onboarded
-{ "isValid": false, "error": "No credential found. Contributor needs to onboard first." }
-```
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `GET` | `/status` | Health check — returns issuer DID |
+| `GET` | `/challenge/:username` | Step 1 — generate nonce for GPG signing |
+| `POST` | `/onboard` | Step 2 — verify GPG signature + issue Verifiable Credential |
+| `POST` | `/verify` | Cryptographically verify a contributor's credential |
 
 ---
 
@@ -535,17 +466,17 @@ curl http://localhost:3000/challenge/darshit2308
 
 The sign/verify pattern is the industry standard for cryptographic proof of key ownership — the same mechanism used by SSH key authentication, code signing, and certificate issuance.
 
-The security guarantee: the server fetches the contributor's public key directly from `github.com/:username.gpg` — the source of truth owned by GitHub itself. No user can fake this. The signature is verified against that key mathematically. This is unforgeable.
+The security guarantee: the server fetches the contributor's public key directly from `github.com/:username.gpg` — the source of truth owned by GitHub itself. The signature is verified against that key mathematically. This is unforgeable without access to the contributor's private key.
 
-### Why `did:key`?
+### Why `did:key` for the MVP?
 
 For the MVP, `did:key` was chosen because it is:
 
 - **Self-contained** — no external ledger required to resolve
 - **Immediately verifiable** — the public key is encoded directly in the DID
-- **Production-compatible** — the system is architecturally designed to swap in `did:hedera` with minimal changes
+- **Production-compatible** — the system is architecturally designed to transition to `did:hedera` with minimal changes
 
-In production, the DID will be anchored on the Hedera Testnet using the Hedera DID Method, providing immutable, publicly auditable identity records.
+In the mentorship, contributor and issuer DIDs will be anchored on the **Hedera Testnet** using the Hedera DID Method, providing immutable, publicly auditable identity records.
 
 ### Cryptographic Verification Chain
 
@@ -588,41 +519,22 @@ against issuer's public key resolved from DID Document
 
 ---
 
-## 🗺️ MVP vs Production
+## 🗺️ MVP vs Mentorship Target
 
 This prototype deliberately simplifies certain components to focus on proving the hardest architectural pieces first. Here is an honest breakdown:
 
-| Feature              | MVP (This Prototype)                             | Production                                                     |
-| -------------------- | ------------------------------------------------ | -------------------------------------------------------------- |
-| **DID Method**       | `did:key` (local, no ledger)                     | `did:hedera` anchored on Hedera Testnet/Mainnet                |
-| **Identity Storage** | ✅ SQLite registry for challenges and issued VCs | Persistent wallet-backed storage / registry model              |
-| **Onboarding UI**    | ✅ **React Web Console**                         | GitHub OAuth-integrated contributor portal                     |
-| **Onboarding Auth**  | ✅ GPG sign/verify challenge-response            | Same — plus key rotation, revocation, and wallet linkage       |
-| **VC Format**        | W3C JWT VC                                       | SD-JWT VC for privacy-preserving presentation                  |
-| **Wallet**           | Server-side Askar wallet for issuer keys only    | Contributor-owned cloud wallet with VC custody                 |
-| **Verification**     | VC signature check through backend registry      | Linked VP from contributor wallet / DID Document               |
-| **GitHub App**       | ✅ Checks API enforcement                        | Full status checks + PR comments + repo-specific configuration |
-
-### What Is Not Done Yet
-
-The items below are **not implemented in the current prototype**. They are the gap between the MVP I have now and the mentorship issue's longer-term target.
-
-| Not Done Yet                     | Current State                                         | What the Mentorship Target Wants                                                   |
-| -------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| GitHub OAuth login               | Contributors do not sign in with GitHub through OAuth | A GitHub-authenticated onboarding entry point in the Heka Web UI                   |
-| Contributor cloud wallet         | No contributor-owned wallet is created or managed     | Heka creates a cloud wallet for each contributor                                   |
-| VC custody in contributor wallet | Credentials are stored server-side in SQLite          | VC is issued into the contributor wallet, not kept as the server’s source of truth |
-| OID4VCI issuance flow            | Not implemented                                       | Standards-based credential issuance into the contributor wallet                    |
-| OID4VP presentation flow         | Not implemented                                       | The contributor wallet presents a Verifiable Presentation to the verifier          |
-| Linked VP in DID Document        | Not implemented                                       | A linked VP can be used to simplify verification                                   |
-| Hedera DID anchoring             | Spike completed (`spikes/hedera-did-anchor`)          | `did:hedera` anchored on Hedera Testnet/Mainnet                                    |
-| SD-JWT VC format                 | Not implemented                                       | Privacy-preserving SD-JWT VC presentation                                          |
-| VC revocation registry           | Not implemented                                       | A revocation mechanism for invalid or compromised credentials                      |
-| Credential lifecycle management  | Not implemented                                       | Rotation, revocation, and lifecycle policies                                       |
-| Repository-specific policies     | Not implemented                                       | Per-repository verification settings and enforcement controls                      |
-| Warn-only mode                   | Not implemented                                       | Maintainable policy modes such as warn-only vs blocking                            |
-| Production admin dashboard       | Not implemented                                       | Full OAuth-backed admin and contributor dashboard                                  |
-| Self-sovereign wallet custody    | Not implemented                                       | Contributor-controlled identity and credential custody                             |
+| Feature | MVP (This Prototype) | Mentorship Target |
+| --- | --- | --- |
+| **DID Method** | `did:key` (local, no ledger) | `did:hedera` anchored on Hedera Testnet |
+| **Identity Storage** | ✅ SQLite registry for challenges and issued VCs | Wallet-managed credential custody in Heka |
+| **Onboarding UI** | ✅ React Web Console | GitHub OAuth-integrated contributor portal in Heka Web UI |
+| **Onboarding Auth** | ✅ GPG sign/verify challenge-response | Same — plus wallet binding, key rotation, and revocation |
+| **VC Format** | W3C JWT VC | SD-JWT VC for selective disclosure |
+| **Wallet** | Server-side Askar wallet (issuer keys only) | Contributor cloud wallet in Heka (server-managed Askar keys; device-sovereign custody is post-mentorship) |
+| **Verification** | VC signature check via backend registry | OID4VP-based Verifiable Presentation from contributor wallet |
+| **Linked VP** | Not implemented | Under active evaluation — may be simplified, made optional, or deferred post-mentorship depending on Heka Web Wallet feasibility |
+| **GitHub App** | ✅ Checks API enforcement | Full status checks + PR comments + per-repository configuration |
+| **Interoperability** | N/A | Credo-ts-based reference wallet (note: Sphereon OID4VC wallet does not support `did:hedera` — this is a known constraint for interop testing scope) |
 
 ---
 
@@ -632,63 +544,89 @@ To avoid any ambiguity, this repository currently proves the following only:
 
 1. A contributor can request a nonce from the backend.
 2. The contributor can sign that nonce with a GitHub-linked GPG key.
-3. The backend can verify the signature.
-4. The backend can issue a Verifiable Credential.
+3. The backend can verify the signature using the public key fetched from GitHub.
+4. The backend can issue a W3C Verifiable Credential.
 5. The backend can store and later re-read that credential from SQLite.
 6. The GitHub App can verify that stored credential and post a PR check result.
 
-It does **not** yet prove the mentorship target's full self-sovereign wallet model. In particular, it does not yet:
+It does **not** yet prove the mentorship target's full production model. In particular, it does not yet:
 
 1. Log the contributor in with GitHub OAuth.
-2. Create a contributor-owned cloud wallet.
-3. Issue the VC directly into that wallet.
-4. Use OID4VCI or OID4VP end to end.
-5. Use `did:hedera` for issuer / contributor DIDs.
-6. Use a linked VP flow for pull request verification.
-7. Provide revocation, rotation, or repository-level policy configuration.
+2. Create a contributor cloud wallet managed by Heka.
+3. Issue the VC into that wallet via OID4VCI.
+4. Use OID4VP for pull request verification end-to-end.
+5. Use `did:hedera` as the primary DID method in the main flow (spike only).
+6. Implement SD-JWT VC selective disclosure.
+7. Provide revocation, key rotation, or repository-level policy configuration.
 
 ---
 
-## 🔭 Next Priority: `did:hedera` Mainnet Integration
+## 📋 What Is Not Done Yet
 
-The following roadmap items represent the next phase of development beyond the current MVP. They are intentionally **not done yet** in this repository:
+The items below are the gap between the current MVP and the mentorship target.
 
-1. **`did:hedera` Testnet Anchor** (✅ **Spike Completed**)
-   - Replace `did:key` with `did:hedera` using Hiero DID SDK / Heka's existing Credo Hedera integration
-   - Anchor both issuer and user DIDs on Hedera Testnet for public auditability and immutability
-   - Integrate with Hedera's DID Method specification for production readiness
-   - *Note: Main MVP still uses `did:key`, but a standalone Hedera testnet anchoring spike has been implemented and verified.*
+| Not Done Yet | Current State | Mentorship Target |
+| --- | --- | --- |
+| GitHub OAuth login | Contributors do not sign in through GitHub OAuth | GitHub-authenticated onboarding entry point in the Heka Web UI |
+| Contributor cloud wallet | No contributor-owned wallet is created | Heka creates and manages a cloud wallet per contributor (Askar, server-side keys) |
+| VC custody in contributor wallet | Credentials stored server-side in SQLite | VC issued into the contributor wallet; SQLite replaced by wallet-backed storage |
+| OID4VCI issuance flow | Not implemented | Standards-based credential issuance into the contributor wallet |
+| OID4VP presentation flow | Not implemented | Contributor wallet presents a Verifiable Presentation to the Heka verifier |
+| Linked VP | Not implemented | Under evaluation — Linked VP provides a fast verification path but requires VP refresh and DID Document updates; may be optional or post-mentorship depending on Heka Web Wallet feasibility |
+| `did:hedera` in main flow | Spike only (`spikes/hedera-did-anchor`) | `did:hedera` anchored on Hedera Testnet for both issuer and contributor DIDs |
+| SD-JWT VC format | Not implemented | Privacy-preserving credential with selective disclosure |
+| VC revocation registry | Not implemented | Credential invalidation mechanism for compromised or expired identities |
+| Credential lifecycle management | Not implemented | Key rotation, re-issuance, and revocation workflows |
+| Repository-specific policies | Not implemented | Per-repository enforcement mode (`warn` / `enforce` / `disabled`), trusted issuers, and grace periods via `.heka/config.yml` |
+| Warn-only mode | Not implemented | Non-blocking policy mode for gradual adoption |
+| Self-sovereign wallet custody | Not implemented | Device-sovereign key management — documented as a post-mentorship extension beyond the prototype scope |
+
+---
+
+## 🔭 Next Steps: Mentorship Roadmap
+
+The following items represent the implementation plan for the LFDT 2026 Mentorship (June 15 – November 30, 2026):
+
+1. **`did:hedera` Testnet Integration** ✅ Spike Complete
+   - Replace `did:key` with `did:hedera` in the main Heka flow
+   - Anchor both issuer and contributor DIDs on Hedera Testnet
+   - Integrate with Hiera DID SDK and Heka's existing Credo Hedera module
+   - _Note: Sphereon OID4VC wallet does not support `did:hedera` — interoperability testing will target a Credo-ts-based reference wallet_
 
 2. **SD-JWT Selective Disclosure**
-   - Contributors can prove specific claims without revealing full identity profile
-   - Enables privacy-preserving credential presentation
+   - Contributors prove specific claims without revealing their full identity profile
+   - Privacy-preserving credential presentation aligned with data minimization principles
 
-3. **VP Presentation Flow**
-   - Full Verifiable Presentation layer where the contributor's wallet presents a VP to the verifier directly
-   - Implements Options 1/2 from [Issue #87](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87) sequence diagrams
+3. **OID4VCI + OID4VP End-to-End**
+   - Standards-based credential issuance (OID4VCI) into contributor cloud wallet
+   - Verifiable Presentation-based PR verification (OID4VP) replacing the current backend registry lookup
 
-4. **VC Revocation Registry**
-   - Mechanism to invalidate credentials when a contributor's account is compromised
-   - Maintains trust in the verification system over time
+4. **Linked VP (Under Evaluation)**
+   - Provides a fast-path verification option by anchoring pre-signed VPs to the contributor DID Document
+   - Feasibility for the prototype scope is being evaluated with the mentor — may be simplified, made optional, or deferred to post-mentorship if a Heka Web Wallet approach is adopted instead
 
-5. **Repository-Specific Configuration**
-   - Allow repo maintainers to set verification strictness (warn-only vs. blocking, grace periods for new contributors)
-   - Enable customizable enforcement policies per repository
+5. **VC Revocation Registry**
+   - Credential invalidation when a GPG key is compromised or a contributor's binding changes
+   - Maintains trust integrity in the verification pipeline over time
 
-6. **Key Rotation and Revocation**
-   - Implement GPG key rotation handling
-   - Support credential lifecycle management
+6. **Repository-Specific Configuration**
+   - Per-repository enforcement via `.heka/config.yml`
+   - Supports `warn`, `enforce`, and `disabled` modes with trusted issuer lists and contributor grace periods
+
+7. **Key Rotation and Lifecycle Management**
+   - GPG key rotation and re-issuance workflows
+   - Issuer DID rollover runbook for operator key compromise scenarios
 
 ---
 
 ## 🤝 Relation to LFDT and Hiero
 
-This prototype is built to be used for moving the components and functionalites directly into the heka repo during the mentorship.
+This prototype was built as a pre-application MVP for the **LF Decentralized Trust Mentorship Program (LFDT-2026)** and was selected for [Issue #87 — Hiero: Contributor Identity Verification Prototype](https://github.com/LF-Decentralized-Trust-Mentorships/mentorship-program/issues/87).
 
 The architecture is designed to integrate with:
 
 - **Heka Identity Platform** — the existing Hiero identity ecosystem (Credo-ts is used internally by Heka)
-- **Identity Collaboration Hub** — the prototype can be tested against real Hiero repositories
+- **Identity Collaboration Hub** — the prototype will be validated against real Hiero repositories
 - **OpenVTC LFDT Lab** — the decentralized trust graph initiative for Linux Kernel contribution flow
 
 This project serves as a reference implementation demonstrating that decentralized identity verification in open-source workflows is not just theoretically sound — it is practically buildable today.
@@ -701,6 +639,7 @@ This project serves as a reference implementation demonstrating that decentraliz
 
 - GitHub: [@darshit2308](https://github.com/darshit2308)
 - LinkedIn: [darshit-khandelwal](https://www.linkedin.com/in/darshit-khandelwal-49bb25288)
+- Built as part of the LFDT Mentorship Program — 2026
 
 ---
 
